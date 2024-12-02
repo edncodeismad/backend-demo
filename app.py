@@ -128,7 +128,8 @@ def chat():
     perform_search = classify_input(user_message)
 
     if perform_search:
-        pre_input = f"Create a concise one-line prompt to feed into a vector similarity search to get a relevant product for this query. Strip all unnecessary conversations and words such as 'I am looking for...' and only keep useful keywords. If reference is made to multiple different products, only create a query based on the last product mentioned in the queries:\nSequence of queries: {'\n'.join(chat_history)}\n{user_message}"
+        joined_history = '\n'.join(chat_history)
+        pre_input = f"Create a concise one-line prompt to feed into a vector similarity search to get a relevant product for this query. Strip all unnecessary conversations and words such as 'I am looking for...' and only keep useful keywords. If reference is made to multiple different products, only create a query based on the last product mentioned in the queries:\nSequence of queries: {joined_history}\n{user_message}"
         chat_history.append(user_message)
         search_query = llm.write_message(pre_input)
 
@@ -140,10 +141,8 @@ def chat():
         # use cosine similarity here (from db.py)
 
         product_results = [get_info(id) for id in ids]
-        
-        prompt = f"Instructions: Always answer as a helpful shop assistant in one or two short sentences. Include the URL link for the product if it is provided in this prompt. Select the most relevant product from the list. If none of the product information is significantly relevant to the user input, do not answer the question and ignore all the product information, and ask the user to rephrase their question.\n\nUser input: {user_message}\n\nProduct information: {'\n'.join(product_results)}"
-        prompt = f"Instructions: Answer as a helpful shop assistant in one or two short sentences. Only choose the most relevant product from the list. Only answer questions related to your products (you sell food products). If none of the products listed here are relevant to the query, ignore the products and ask the user to rephrase their question.\n\nUser input: {user_message}\n\nYour previous response: {prev_response}\n\nProduct information: {'\n'.join(product_results)}"
-        #prompt = f"Instructions: Answer as a helpful shop assistant in one or two short sentences. Only answer questions related to your products (you sell food products). If none of the products listed here are relevant to the query, ignore the products and ask the user to rephrase their question.\n\nUser input: {user_message}. User search: {search_query}\n\nChoose from the following products: {'\n'.join(product_results)}"
+        joined_results = '\n'.join(product_results)
+        prompt = f"Instructions: Answer as a helpful shop assistant in one or two short sentences. Only choose the most relevant product from the list. Only answer questions related to your products (you sell food products). If none of the products listed here are relevant to the query, ignore the products and ask the user to rephrase their question.\n\nUser input: {user_message}\n\nYour previous response: {prev_response}\n\nProduct information: {joined_results}"
         response = llm.write_message(prompt)
 
 
@@ -178,4 +177,4 @@ def chat():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run()
