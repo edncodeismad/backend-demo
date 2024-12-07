@@ -13,18 +13,14 @@ class GPT:
         self.model_name = model_name
         pass
 
-    def write_message(self, prompt, logging=False):
-
-        if self.model_name == 'test':
-            return 'testing text'
-
+    def write_message(self, prompt, system_prompt="", logging=False):
 
         client = OpenAI(api_key=api_key)
 
         completion = client.chat.completions.create(
         model=self.model_name,
         messages=[
-            {"role": "system", "content": "You will help me write salesbot messages"},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
         ]
         )
