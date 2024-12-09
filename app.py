@@ -8,6 +8,8 @@ from usingllm import GPT
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from pinecone_text.sparse import BM25Encoder
+import nltk
+nltk.download('punkt_tab')
 sparse_encoder = BM25Encoder()
 
 """
